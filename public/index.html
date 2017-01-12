@@ -3,8 +3,106 @@
   <head>
     <meta charset="utf-8">
     <title>Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .loading-fill {
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+
+      }
+      .loading {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+
+      }
+      .loading-fill .loading-spinner {
+        width: 100px;
+        height: 100px;
+        background: #eee;
+        border-radius: 50%;
+        position: relative;
+        margin: 50px;
+        display: inline-block;
+      }
+      .loading .loading-spinner {
+        width: 50px;
+        height: 50px;
+        background: #eee;
+        border-radius: 50%;
+        position: relative;
+        margin: 50px;
+        display: inline-block;
+      }
+
+      .loading-fill .loading-spinner:after, .loading-fill .loading-spinner:before {
+        width: 100px;
+        height: 100px;
+        top: -4px;
+        left: -4px;
+        border: 4px solid transparent;
+      }
+
+      .loading .loading-spinner:after, .loading .loading-spinner:before {
+        width: 50px;
+        height: 50px;
+        top: -2px;
+        left: -2px;
+        border: 2px solid transparent;
+      }
+
+      .loading-fill .loading-spinner:after, .loading-fill .loading-spinner:before, .loading .loading-spinner:after, .loading .loading-spinner:before {
+        content: '';
+        display: block;
+        border-radius: 50%;
+        position: absolute;
+        border-top-color: #ffab40;
+        border-bottom-color: #ffab40;
+        animation: spinny 1s linear infinite;
+      }
+
+      @keyframes spinny {
+        0% {
+          transform: rotate(0deg) scale(1);
+        }
+        50% {
+          transform: rotate(45deg) scale(1.2);
+        }
+        100% {
+          transform: rotate(360deg) scale(1);
+        }
+      }
+      .loading .loading-info, .loading-fill .loading-info {
+        font-family: monospace;
+        font-size: 32px;
+        color: darkgray;
+      }
+    </style>
   </head>
   <body>
-    
+    <div id="app" ng-app="chatapp">
+      <div class="loading-fill">
+        <div class="loading-spinner"></div>
+        <div class="loading-info">
+          Chat
+        </div>
+      </div>
+    </div>
+    <script src="vendor/socket.io.min.js"></script>
+    <script src="vendor/angular.min.js"></script>
+    <script src="vendor/ui-router.min.js"></script>
+    <script src="js/socketservice.js"></script>
+    <script src="js/ctrls/index.js"></script>
+    <script src="js/ctrls/app.js"></script>
+    <script src="js/ctrls/appChat.js"></script>
+    <script src="js/ctrls/appNewChat.js"></script>
   </body>
 </html>

@@ -4,6 +4,7 @@ const userRouter = require('express').Router()
 const config = require('./config.json')
 
 const users = {}
+const passwords = {}
 
 module.exports = {router: userRouter, findByName: findByName, authMiddleware}
 
@@ -20,7 +21,7 @@ function findByName (username) {
 }
 
 function authMiddleware (req, res, next) {
-  const token = req.headers['x-access-token'] || req.query.token || req.body.access_token
+  const token = req.headers['Authentication'] || req.query.token || req.body.access_token
   if (!token) {
     res.status(401).send({msg: "No access token provided"})
     return
@@ -51,7 +52,8 @@ userRouter.post('/', (req, res) => {
     return
   }
   //add user
-  users[username] = {password}
+  users[username] = {username}
+  passwords[username] = password
 })
 
 userRouter.post('/login', (req, res) => {
@@ -68,7 +70,7 @@ userRouter.post('/login', (req, res) => {
     res.status(404).send({msg: "Username was not found"})
     return
   }
-  if (users[username].password === password) {
+  if (passwords[username] === password) {
     res.status(200).send(createJwt(username))
   } else {
     res.status(404).send({msg: "Password is incorrect"})

@@ -19,7 +19,7 @@ app.use('/chat', chats.router)
 
 const server = http.createServer(app)
 
-sockets(server)
+sockets.init(server)
 
 server.listen(config.port, () => {
   console.log("Server is running on " + config.port)
