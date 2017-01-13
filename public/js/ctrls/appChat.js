@@ -5,6 +5,7 @@ angular.module('chatapp')
     chat.sendMessage($stateParams.username, $scope.messageInput, function (msg) {
       if (msg == null) return
       $scope.chat.messages.push(msg)
+      $scope.messageInput = ""
     })
   }
 
@@ -17,9 +18,7 @@ angular.module('chatapp')
     }
     $scope.chat = chat
     $rootScope.$on('newMessage', function (e, data) {
-      console.log(data)
       if (data.chatWith == $stateParams.username) {
-        console.log("match")
         $timeout(function () {
           $scope.chat.messages.push(data.message)
         })

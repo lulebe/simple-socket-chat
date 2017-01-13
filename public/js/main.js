@@ -26,37 +26,38 @@ app.config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
       url: '/newChat',
       templateUrl: 'views/app/newchat.html',
       controller: 'appNewChatCtrl'
-    });
+    })
   //auth interceptor
-  $httpProvider.interceptors.push('authInterceptor');
-});
+  $httpProvider.interceptors.push('authInterceptor')
+})
 
 //auth interceptor for HTTP requests
-app.factory('authInterceptor', function($rootScope, $q, $window, $injector) {
+app.factory('authInterceptor', function($rootScope, $q, $injector, login) {
   return {
     request: function (config) {
-      config.headers = config.headers || {};
-      if ($window.sessionStorage.authToken) {
-        config.headers.Authorization = $window.sessionStorage.authToken;
+      config.headers = config.headers || {}
+      if (login.getToken()) {
+        config.headers.Authorization = login.getToken()
       }
       return config;
     },
     responseError: function (res) {
       if (res.status === 401) {
-        $window.sessionStorage.removeItem('authToken');
-        var $state = $injector.get('$state');
-        $state.go('index');
+        $window.sessionStorage.removeItem('authToken')
+        var $state = $injector.get('$state')
+        $state.go('index')
       }
-      return $q.reject(res);
+      return $q.reject(res)
     }
-  };
-});
+  }
+})
 
 
-app.run(function($rootScope, $http, $state, $window) {
+app.run(function($rootScope, $http, $state, login) {
   $rootScope.$on('$stateChangeStart', function (event, toState) {
-    if (toState.data.auth === true && !$window.sessionStorage.authToken) {
+    if (toState.data.auth === true && !login.getToken()) {
       event.preventDefault()
+      $state.go('index')
     }
-  });
-});
+  })
+})

@@ -1,10 +1,11 @@
 angular.module('chatapp')
-.factory('chat', function ($http, $window) {
+.factory('chat', function ($http, $window, $rootScope) {
 
   function getChat (partnername, cb) {
     $http.get($window.location.origin + '/chat/' + partnername)
     .then(function (res) {
       cb(res.data)
+      $rootScope.$emit('createdChat', res.data)
     }, function () {
       cb(null)
     })

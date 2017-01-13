@@ -1,30 +1,25 @@
 angular.module('chatapp')
-.factory('socket', function ($window, $rootScope) {
+.factory('socket', function ($window, $rootScope, $window) {
 
   var socket = null
 
-  function openSocket () {
+  function openSocket (authToken) {
     if (socket != null)
       closeSocket()
-    var token = $window.sessionStorage.authToken
+    var token = authToken
     if (!token)
       return false
     socket = io.connect($window.location.origin)
     socket.on('connect', function () {
-      console.log("authenticate")
       socket.emit('authentication', token)
       socket.on('authenticated', function () {
-        console.log("authenticated")
         socket.on('createdChat', function (data) {
-          console.log(data)
-          $rootScope.$emit('createdChat', data)
+          $rootScope.$emit('createdChat', data.chat)
         })
         socket.on('newMessage', function (data) {
-          console.log(data)
           $rootScope.$emit('newMessage', data)
         })
         socket.on('messageUpdate', function (data) {
-          console.log(data)
           $rootScope.$emit('messageUpdate', data)
         })
       })

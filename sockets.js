@@ -8,7 +8,6 @@ const userSockets = {}
 const socketUsers = {}
 
 function addSocketForUser (username, socket) {
-  console.log("add socket for", username)
   if (!userSockets[username])
     userSockets[username] = []
   userSockets[username].push(socket)
@@ -28,10 +27,8 @@ function sendToUser (username, eventname, data) {
   const uSockets = userSockets[username]
   if (!uSockets)
     return
-  console.log("send to user:")
-  console.log(username, eventname, data)
   uSockets.forEach(socket => {
-    console.log("found socket")
+    socket.emit(eventname, data)
   })
 }
 

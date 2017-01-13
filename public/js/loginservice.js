@@ -1,50 +1,57 @@
 angular.module('chatapp')
-.factory('login', function ($window, $http, $state, socket) {
+.factory('login', function ($window, $injector, socket) {
+
+  var currentUsername = null
+  var currentToken = null
 
   function signin (username, password) {
-    $http.post($window.location.origin + '/user/login', {
+    $injector.get('$http').post($window.location.origin + '/user/login', {
       username: username,
       password: password
     }).then(function (res) {
-      $window.sessionStorage.authToken = res.data
-      $window.sessionStorage.username = username
-      socket.openSocket()
-      $state.go('app.newChat')
+      currentToken = res.data
+      currentUsername = username
+      socket.openSocket(currentToken)
+      $injector.get('$state').go('app.newChat')
     }, function (res) {
       //TODO handle signin error
     })
   }
 
   function signout () {
-    $window.sessionStorage.removeItem('authToken')
-    $window.sessionStorage.removeItem('username')
+    currentToken = null
+    currentUsername = null
     socket.closeSocket()
-    $state.go('index')
+    $injector.get('$state').go('index')
   }
 
   function signup (username, password) {
-    console.log(username, password)
-    $http.post($window.location.origin + '/user', {
+    $injector.get('$http').post($window.location.origin + '/user', {
       username: username,
       password: password
     }).then(function (res) {
-      $window.sessionStorage.authToken = res.data
-      $window.sessionStorage.username = username
-      socket.openSocket()
-      $state.go('app.newChat')
+      currentToken = res.data
+      currentUsername = username
+      socket.openSocket(currentToken)
+      $injector.get('$state').go('app.newChat')
     }, function (res) {
       //TODO handle signup error
     })
   }
 
+  function getToken () {
+    return currentToken
+  }
+
   function getUsername () {
-    return $window.sessionStorage.username
+    return currentUsername
   }
 
   return {
     signin: signin,
     signout: signout,
     signup: signup,
+    getToken: getToken,
     getUsername: getUsername
   }
 })

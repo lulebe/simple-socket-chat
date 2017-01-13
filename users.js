@@ -9,9 +9,6 @@ const passwords = {}
 module.exports = {router: userRouter, findByName: findByName, authMiddleware}
 
 function userExists (username) {
-  console.log(username)
-  console.log(users)
-  console.log(users[username])
   return users[username] != undefined
 }
 
