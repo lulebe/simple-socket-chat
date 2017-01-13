@@ -26,7 +26,7 @@ const server = http.createServer(app)
 sockets.init(server)
 
 server.listen(process.env.PORT || config.port, () => {
-  console.log('Server is running on ' + process.env.PORT || config.port)
+  console.log('Server is running on ' + (process.env.PORT || config.port))
 })
 
 process.on('exit', exit)
