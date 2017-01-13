@@ -100,6 +100,7 @@ chatRouter.get('/:username', (req, res) => {
 chatRouter.post('/:username/message', (req, res) => {
   if (!req.body.message) {
     res.status(400).send({msg: "No message was specified"})
+    return
   }
   const chat = getChatIfExists(req.user.username, users.findByName(req.params.username).username)
   if (!chat) {
@@ -113,6 +114,7 @@ chatRouter.post('/:username/message', (req, res) => {
 chatRouter.put('/:username/message/:messageId', (req, res) => {
   if (!req.body.message) {
     res.status(400).send({msg: "No message was specified"})
+    return
   }
   const chat = getChatIfExists(req.user.username, users.findByName(req.params.username).username)
   if (!chat) {
