@@ -36,57 +36,55 @@ function getOrCreateChat (userA, userB) {
   const chat = {userA, userB, messages: []}
   chats.push(chat)
   sockets.sendToUser(
-    userB.username,
-    eventnames.chatCreated,
-    {chat: chatWithoutMessages(chat)}
+    userB,
+    eventnames.createdChat,
+    {chat: chat}
   )
   return chat
 }
 
 function insertMessageIntoChat(chat, user, message) {
-  const id = new UUID()
+  const id = new UUID().toString('hex')
   const msg = {
     id: id,
-    by: user.username,
+    by: user,
     at: new Date().toISOString(),
     msg: message,
     edited: false
   }
   chat.messages.push(msg)
+  const partnername = chat.userA == user ? chat.userB : chat.userA
   sockets.sendToUser(
-    userB.username,
+    partnername,
     eventnames.newMessage,
-    {chat: chatWithoutMessages(chat), message: msg}
+    {chatWith: user, message: msg}
   )
   return msg
 }
 
-function updateMessage(chat, messageId, user, message) {
-  const matches = chat.messages.filter(msg => msg.id === messageId && msg.by === user.username)
+function updateMessage(chat, messageId, username, message) {
+  const matches = chat.messages.filter(msg => msg.id === messageId && msg.by === username)
   if (matches.length !== 1)
     return null
   const msg = matches[0]
   msg.msg = messages
   msg.edited = true
   sockets.sendToUser(
-    userB.username,
+    userB,
     eventnames.messageUpdate,
-    {chat: chatWithoutMessages(chat), message: msg}
+    {chatWith: user, message: msg}
   )
   return msg
 }
 
 function getChatsForUser (user) {
   return chats.filter(chat =>
-    chat.userA === userA || chat.userB === userA
+    chat.userA === user || chat.userB === user
   )
 }
 
 chatRouter.get('/', (req, res) => {
-  res.status(200).send(getChatsForUser.map(chat => {
-    const newChatInstance = Object.assing({}, chat)
-    delete newChatInstance.messages
-  }))
+  res.status(200).send(getChatsForUser(req.user.username).map(chat => chatWithoutMessages(chat)))
 })
 
 chatRouter.get('/:username', (req, res) => {
@@ -95,7 +93,7 @@ chatRouter.get('/:username', (req, res) => {
     res.status(404).send({msg: "Chat partner does not exist"})
     return
   }
-  const chat = getOrCreateChat(req.user, partner)
+  const chat = getOrCreateChat(req.user.username, partner.username)
   res.status(200).send(chat)
 })
 
@@ -103,12 +101,12 @@ chatRouter.post('/:username/message', (req, res) => {
   if (!req.body.message) {
     res.status(400).send({msg: "No message was specified"})
   }
-  const chat = getChatIfExists(req.user, users.findByName(req.params.username))
+  const chat = getChatIfExists(req.user.username, users.findByName(req.params.username).username)
   if (!chat) {
     res.status(404).send({msg: "Chat was not found"})
     return
   }
-  const message = insertMessageIntoChat(chat, req.user, req.body.message)
+  const message = insertMessageIntoChat(chat, req.user.username, req.body.message)
   res.status(201).send(message)
 })
 
@@ -116,12 +114,12 @@ chatRouter.put('/:username/message/:messageId', (req, res) => {
   if (!req.body.message) {
     res.status(400).send({msg: "No message was specified"})
   }
-  const chat = getChatIfExists(req.user, users.findByName(req.params.username))
+  const chat = getChatIfExists(req.user.username, users.findByName(req.params.username).username)
   if (!chat) {
     res.status(404).send({msg: "Chat was not found"})
     return
   }
-  const message = updateMessage(chat, req.params.messageId, req.user, req.body.message)
+  const message = updateMessage(chat, req.params.messageId, req.user.username, req.body.message)
   if (!message) {
     res.status(404).send({msg: 'Message was not found'})
     return

@@ -1,0 +1,7 @@
+<button ng-click="signout()">logout</button>
+<h1>all Chats</h1>
+<a ui-sref="app.newChat">create new chat</a>
+<ul>
+  <li ng-repeat="chat in chats"><a ui-sref="app.chat({username: chat.partner})">{{chat.partner}}</a></li>
+</ul>
+<div ui-view></div>

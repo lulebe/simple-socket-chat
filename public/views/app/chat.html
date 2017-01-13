@@ -1,1 +1,10 @@
-chat
+<h1>Chat with {{partner}}</h1>
+
+<ul>
+  <li ng-repeat="message in chat.messages"><strong>{{message.by}}:</strong> {{message.msg}}</li>
+</ul>
+
+<form ng-submit="sendMessage()">
+  <input type="text" ng-model="messageInput" placeholder="new message"><br>
+  <input type="submit" value="send">
+</form>

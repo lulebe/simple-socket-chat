@@ -8,9 +8,10 @@ const userSockets = {}
 const socketUsers = {}
 
 function addSocketForUser (username, socket) {
-  if (!sockets[username])
-    sockets[username] = []
-  sockets[username].push(socket)
+  console.log("add socket for", username)
+  if (!userSockets[username])
+    userSockets[username] = []
+  userSockets[username].push(socket)
   socketUsers[socket] = username
 }
 
@@ -18,7 +19,7 @@ function removeSocket (socket) {
   const username = socketUsers[socket]
   if (!username)
     return
-  const uSockets = sockets[username]
+  const uSockets = userSockets[username]
   uSockets.splice(uSockets.indexOf(socket), 1)
   delete socketUsers[socket]
 }
@@ -27,8 +28,10 @@ function sendToUser (username, eventname, data) {
   const uSockets = userSockets[username]
   if (!uSockets)
     return
+  console.log("send to user:")
+  console.log(username, eventname, data)
   uSockets.forEach(socket => {
-    socket.emit(eventname, data)
+    console.log("found socket")
   })
 }
 

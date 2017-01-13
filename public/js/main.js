@@ -18,7 +18,7 @@ app.config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
       controller: 'appCtrl'
     })
     .state('app.chat', {
-      url: '/chat',
+      url: '/chat/:username',
       templateUrl: 'views/app/chat.html',
       controller: 'appChatCtrl'
     })
@@ -44,8 +44,6 @@ app.factory('authInterceptor', function($rootScope, $q, $window, $injector) {
     responseError: function (res) {
       if (res.status === 401) {
         $window.sessionStorage.removeItem('authToken');
-        $window.sessionStorage.removeItem('userId');
-        $window.sessionStorage.removeItem('username');
         var $state = $injector.get('$state');
         $state.go('index');
       }

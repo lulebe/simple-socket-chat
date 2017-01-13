@@ -9,6 +9,9 @@ const passwords = {}
 module.exports = {router: userRouter, findByName: findByName, authMiddleware}
 
 function userExists (username) {
+  console.log(username)
+  console.log(users)
+  console.log(users[username])
   return users[username] != undefined
 }
 
@@ -21,7 +24,7 @@ function findByName (username) {
 }
 
 function authMiddleware (req, res, next) {
-  const token = req.headers['Authentication'] || req.query.token || req.body.access_token
+  const token = req.get('authorization') || req.query.token || req.body.access_token
   if (!token) {
     res.status(401).send({msg: "No access token provided"})
     return
@@ -34,13 +37,12 @@ function authMiddleware (req, res, next) {
     req.user = users[decoded.username]
     next()
   })
-  next()
 }
 
 userRouter.post('/', (req, res) => {
   //check correct parameters
-  if (!req.body.username || req.body.password) {
-    res.status(400).send()
+  if (!req.body.username || !req.body.password) {
+    res.status(400).send({msg: "Bad Parameters"})
     return
   }
   //remove leading and trailing spaces
@@ -54,12 +56,13 @@ userRouter.post('/', (req, res) => {
   //add user
   users[username] = {username}
   passwords[username] = password
+  res.status(201).send(createJwt(username))
 })
 
 userRouter.post('/login', (req, res) => {
   //check correct parameters
-  if (!req.body.username || req.body.password) {
-    res.status(400).send()
+  if (!req.body.username || !req.body.password) {
+    res.status(400).send({msg: 'Bad Parameters'})
     return
   }
   //remove leading and trailing spaces
