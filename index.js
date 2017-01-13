@@ -25,7 +25,7 @@ const server = http.createServer(app)
 
 sockets.init(server)
 
-server.listen(config.port, () => {
+server.listen(process.env.PORT || config.port, () => {
   console.log('Server is running on ' + process.env.PORT || config.port)
 })
 
