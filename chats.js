@@ -1,3 +1,5 @@
+const fs = require('fs')
+const path = require('path')
 const UUID = require('node-time-uuid')
 const chatRouter = require('express').Router()
 
@@ -6,9 +8,29 @@ const eventnames = require('./socketevents.json')
 const users = require('./users')
 const sockets = require('./sockets')
 
-const chats = []
+const DATA_PATH = path.join(__dirname, 'chatdata.json')
 
-module.exports = {router: chatRouter}
+var chats = []
+
+module.exports = {init: init, exit: exit, router: chatRouter}
+
+
+//init & exit functions
+function init () {
+  if (!fs.existsSync(DATA_PATH)) return
+  const json = fs.readFileSync(DATA_PATH, 'utf8')
+  try {
+    chats = JSON.parse(json)
+  } catch (e) {}
+}
+
+function exit () {
+  const json = JSON.stringify(chats)
+  fs.writeFileSync(DATA_PATH, json)
+}
+
+
+
 
 function getChatIfExists (userA, userB) {
   const matches = chats.filter(chat =>

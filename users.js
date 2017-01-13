@@ -1,12 +1,34 @@
+const fs = require('fs')
+const path = require('path')
 const jwt = require('jsonwebtoken')
 const userRouter = require('express').Router()
 
 const config = require('./config.json')
 
-const users = {}
-const passwords = {}
+const DATA_PATH = path.join(__dirname, 'userdata.json')
 
-module.exports = {router: userRouter, findByName: findByName, authMiddleware}
+var users = {}
+var passwords = {}
+
+module.exports = {init: init, exit: exit, router: userRouter, findByName: findByName, authMiddleware}
+
+//init & exit functions
+function init () {
+  if (!fs.existsSync(DATA_PATH)) return
+  const json = fs.readFileSync(DATA_PATH, 'utf8')
+  try {
+    const data = JSON.parse(json)
+    users = data.users
+    passwords = data.passwords
+  } catch (e) {}
+}
+
+function exit () {
+  const json = JSON.stringify({users: users, passwords: passwords})
+  fs.writeFileSync(DATA_PATH, json)
+}
+
+
 
 function userExists (username) {
   return users[username] != undefined
