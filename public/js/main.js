@@ -1,4 +1,4 @@
-var app = angular.module('chatapp', ['ui.router'])
+var app = angular.module('chatapp', ['ui.router', 'luegg.directives'])
 
 app.config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
   $urlRouterProvider

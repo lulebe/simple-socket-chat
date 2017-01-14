@@ -7,6 +7,6 @@
     <li ng-repeat="chat in chats"><a ui-sref="app.chat({username: chat.partner})">{{chat.partner}}</a></li>
   </ul>
 </div>
-<div ui-view class="chat">
+<div ui-view class="chat" scroll-glue>
 
 </div>
