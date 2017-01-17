@@ -4,9 +4,11 @@ const jwt = require('jsonwebtoken')
 
 const config = require('./config')
 
+//socket storage
 const userSockets = {}
 const socketUsers = {}
 
+//insert socket for specified user
 function addSocketForUser (userId, socket) {
   if (!userSockets[userId])
     userSockets[userId] = []
@@ -14,6 +16,7 @@ function addSocketForUser (userId, socket) {
   socketUsers[socket] = userId
 }
 
+//delete specified socket from storage
 function removeSocket (socket) {
   const userId = socketUsers[socket]
   if (!userId)
@@ -23,6 +26,7 @@ function removeSocket (socket) {
   delete socketUsers[socket]
 }
 
+//send data to all sockets of specified user
 function sendToUser (userId, eventname, data) {
   const uSockets = userSockets[userId]
   if (!uSockets)
@@ -32,10 +36,11 @@ function sendToUser (userId, eventname, data) {
   })
 }
 
+//init socket.io
 function init (httpServer) {
   const socketServer = socket().listen(httpServer)
 
-  //authentication
+  //socket user authentication
   socketAuth(socketServer, {
     authenticate: (socket, data, cb) => {
       jwt.verify(data, config.jwtSecret, (err, decoded) => {
@@ -49,7 +54,7 @@ function init (httpServer) {
     }
   })
 
-  //standard socket code
+  //handle socket disconnect
   socketServer.on('connection', socket => {
     socket.on('disconnect', () => {
       removeSocket(socket)

@@ -8,6 +8,9 @@ const models = require('./db').models
 module.exports = {router: userRouter, findByName: findByName, authMiddleware}
 
 
+//HELPERS
+
+
 //sign jwt for user
 function createJwt (userId) {
   return jwt.sign({userId}, config.jwtSecret, {expiresIn: "12h"})
@@ -34,7 +37,10 @@ function authMiddleware (req, res, next) {
 }
 
 
+//ROUTES
 
+
+//create new user
 userRouter.post('/', (req, res) => {
   //check correct parameters
   if (!req.body.username || !req.body.password)
@@ -61,6 +67,7 @@ userRouter.post('/', (req, res) => {
   })
 })
 
+//create jwt for existing user
 userRouter.post('/login', (req, res) => {
   //check correct parameters
   if (!req.body.username || !req.body.password) {
@@ -85,6 +92,18 @@ userRouter.post('/login', (req, res) => {
   })
 })
 
+//search user by username
+userRouter.get('/search', (req, res) => {
+  if (!req.query.q)
+    return res.status(400).send({msg: "No search query param (q) provided"})
+  models.User.findOne({username: req.query.q}).select('name').exec((err, user) {
+    if (err)
+      return res.status(500).send(err)
+    res.status(200).send(user)
+  })
+})
+
+//get info about user by userId
 userRouter.get('/:userid', (req, res) => {
   //find user and return only id and username, not password!
   models.User.findById(req.params.userid).select('name').exec((err, user) => {

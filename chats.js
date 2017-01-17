@@ -1,3 +1,11 @@
+/*
+TODO
+1. use mongo instead of object looksups everywhere
+2. use userIds instead of usernames
+*/
+
+
+
 const UUID = require('node-time-uuid')
 const chatRouter = require('express').Router()
 
@@ -8,6 +16,9 @@ const sockets = require('./sockets')
 const models = require('./db').models
 
 module.exports = {router: chatRouter}
+
+
+//HELPERS
 
 
 //TODO fully implement
@@ -61,29 +72,50 @@ function updateMessage(chat, messageId, username, message) {
   return msg
 }
 
-//TODO fully implement
+
+//ROUTES
+
+
+//get metadata for all chats of current users
 chatRouter.get('/', (req, res) => {
-  res.status(200).send(getChatsForUser(req.user.id).map(chat => chatWithoutMessages(chat)))
+  req.user.getChats((err, chats) => {
+    if (err)
+      return res.status(500).send(err)
+    res.status(200).send(chats)
+  })
 })
 
-//TODO fully implement
+//get chat with messages by id, error if user is no member
 chatRouter.get('/:chatid', (req, res) => {
-  const partner = users.findByName(req.params.username)
-  if (!partner) {
-    res.status(404).send({msg: "Chat partner does not exist"})
-    return
-  }
-  const chat = getOrCreateChat(req.user.username, partner.username)
-  res.status(200).send(chat)
+  models.Chat.getIfForUser(req.params.chatid, req.user.id, (err, chat) => {
+    if (err)
+      return res.status(500).send(err)
+    if (!chat)
+      return res.status(404).send({msg: "Chat was not found"})
+    res.status(200).send(chat)
+  })
 })
 
-//TODO fully implement
+//create chat with partners and optional groupName
 chatRouter.post('/', (req, res) => {
   if (!req.body.partners)
     return res.status(400).send({msg: "No chat partners specified"})
+  const users = [req.user.id]
+  users.concat(req.body.partners)
+  const chat = new models.Chat({
+    members: users,
+    groupName: req.body.groupName,
+    messages: []
+  })
+  chat.save((err, chat) => {
+    if (err)
+      return res.status(500).send(err)
+    res.status(201).send(chat)
+  })
 })
 
 //TODO fully implement
+//post new message into chat if allowed to
 chatRouter.post('/:chatid/message', (req, res) => {
   if (!req.body.message) {
     res.status(400).send({msg: "No message was specified"})
@@ -99,6 +131,7 @@ chatRouter.post('/:chatid/message', (req, res) => {
 })
 
 //TODO fully implement
+//change message if allowed to
 chatRouter.put('/:chatid/message/:messageid', (req, res) => {
   if (!req.body.message) {
     res.status(400).send({msg: "No message was specified"})
