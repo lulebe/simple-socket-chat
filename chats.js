@@ -1,53 +1,23 @@
-const fs = require('fs')
-const path = require('path')
 const UUID = require('node-time-uuid')
 const chatRouter = require('express').Router()
 
-const config = require('./config.json')
+const config = require('./config')
 const eventnames = require('./socketevents.json')
 const users = require('./users')
 const sockets = require('./sockets')
+const models = require('./db').models
 
-const DATA_PATH = path.join(__dirname, 'chatdata.json')
-
-var chats = []
-
-module.exports = {init: init, exit: exit, router: chatRouter}
+module.exports = {router: chatRouter}
 
 
-//init & exit functions
-function init () {
-  if (!fs.existsSync(DATA_PATH)) return
-  const json = fs.readFileSync(DATA_PATH, 'utf8')
-  try {
-    chats = JSON.parse(json)
-  } catch (e) {}
-}
-
-function exit () {
-  const json = JSON.stringify(chats)
-  fs.writeFileSync(DATA_PATH, json)
-}
-
-
-
-
-function getChatIfExists (userA, userB) {
-  const matches = chats.filter(chat =>
-    (chat.userA === userA && chat.userB === userB) ||
-    (chat.userA === userB && chat.userB === userA)
-  )
-  if (matches.length === 1)
-    return matches[0]
-  return null
-}
-
+//TODO fully implement
 function chatWithoutMessages (chat) {
   const newChatInstance = Object.assign({}, chat)
   delete newChatInstance.messages
   return newChatInstance
 }
 
+//TODO fully implement
 function getOrCreateChat (userA, userB) {
   const matches = chats.filter(chat =>
     (chat.userA === userA && chat.userB === userB) ||
@@ -65,25 +35,17 @@ function getOrCreateChat (userA, userB) {
   return chat
 }
 
-function insertMessageIntoChat(chat, user, message) {
-  const id = new UUID().toString('hex')
+//TODO fully implement
+function insertMessageIntoChat(chat, user, message, cb) {
   const msg = {
-    id: id,
     by: user,
-    at: new Date().toISOString(),
-    msg: message,
+    content: message,
     edited: false
   }
-  chat.messages.push(msg)
-  const partnername = chat.userA == user ? chat.userB : chat.userA
-  sockets.sendToUser(
-    partnername,
-    eventnames.newMessage,
-    {chatWith: user, message: msg}
-  )
-  return msg
+  cb()
 }
 
+//TODO fully implement
 function updateMessage(chat, messageId, username, message) {
   const matches = chat.messages.filter(msg => msg.id === messageId && msg.by === username)
   if (matches.length !== 1)
@@ -99,17 +61,13 @@ function updateMessage(chat, messageId, username, message) {
   return msg
 }
 
-function getChatsForUser (user) {
-  return chats.filter(chat =>
-    chat.userA === user || chat.userB === user
-  )
-}
-
+//TODO fully implement
 chatRouter.get('/', (req, res) => {
-  res.status(200).send(getChatsForUser(req.user.username).map(chat => chatWithoutMessages(chat)))
+  res.status(200).send(getChatsForUser(req.user.id).map(chat => chatWithoutMessages(chat)))
 })
 
-chatRouter.get('/:username', (req, res) => {
+//TODO fully implement
+chatRouter.get('/:chatid', (req, res) => {
   const partner = users.findByName(req.params.username)
   if (!partner) {
     res.status(404).send({msg: "Chat partner does not exist"})
@@ -119,7 +77,14 @@ chatRouter.get('/:username', (req, res) => {
   res.status(200).send(chat)
 })
 
-chatRouter.post('/:username/message', (req, res) => {
+//TODO fully implement
+chatRouter.post('/', (req, res) => {
+  if (!req.body.partners)
+    return res.status(400).send({msg: "No chat partners specified"})
+})
+
+//TODO fully implement
+chatRouter.post('/:chatid/message', (req, res) => {
   if (!req.body.message) {
     res.status(400).send({msg: "No message was specified"})
     return
@@ -133,7 +98,8 @@ chatRouter.post('/:username/message', (req, res) => {
   res.status(201).send(message)
 })
 
-chatRouter.put('/:username/message/:messageId', (req, res) => {
+//TODO fully implement
+chatRouter.put('/:chatid/message/:messageid', (req, res) => {
   if (!req.body.message) {
     res.status(400).send({msg: "No message was specified"})
     return
@@ -143,7 +109,7 @@ chatRouter.put('/:username/message/:messageId', (req, res) => {
     res.status(404).send({msg: "Chat was not found"})
     return
   }
-  const message = updateMessage(chat, req.params.messageId, req.user.username, req.body.message)
+  const message = updateMessage(chat, req.params.messageid, req.user.username, req.body.message)
   if (!message) {
     res.status(404).send({msg: 'Message was not found'})
     return

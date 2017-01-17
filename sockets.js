@@ -2,29 +2,29 @@ const socket = require('socket.io')
 const socketAuth = require('socketio-auth')
 const jwt = require('jsonwebtoken')
 
-const config = require('./config.json')
+const config = require('./config')
 
 const userSockets = {}
 const socketUsers = {}
 
-function addSocketForUser (username, socket) {
-  if (!userSockets[username])
-    userSockets[username] = []
-  userSockets[username].push(socket)
-  socketUsers[socket] = username
+function addSocketForUser (userId, socket) {
+  if (!userSockets[userId])
+    userSockets[userId] = []
+  userSockets[userId].push(socket)
+  socketUsers[socket] = userId
 }
 
 function removeSocket (socket) {
-  const username = socketUsers[socket]
-  if (!username)
+  const userId = socketUsers[socket]
+  if (!userId)
     return
-  const uSockets = userSockets[username]
+  const uSockets = userSockets[userId]
   uSockets.splice(uSockets.indexOf(socket), 1)
   delete socketUsers[socket]
 }
 
-function sendToUser (username, eventname, data) {
-  const uSockets = userSockets[username]
+function sendToUser (userId, eventname, data) {
+  const uSockets = userSockets[userId]
   if (!uSockets)
     return
   uSockets.forEach(socket => {
@@ -38,12 +38,12 @@ function init (httpServer) {
   //authentication
   socketAuth(socketServer, {
     authenticate: (socket, data, cb) => {
-      jwt.verify(data, config.jwt_secret, (err, decoded) => {
-        if (err || !decoded.username) {
+      jwt.verify(data, config.jwtSecret, (err, decoded) => {
+        if (err || !decoded.userId) {
           cb(err, false)
           return
         }
-        addSocketForUser (decoded.username, socket)
+        addSocketForUser (decoded.userId, socket)
         cb(null, true)
       })
     }

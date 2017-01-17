@@ -2,38 +2,30 @@ const http = require('http')
 const express = require('express')
 const bodyParser = require('body-parser')
 
-const config = require('./config.json')
+const config = require('./config')
+const db = require('./db')
 const users = require('./users')
 const chats = require('./chats')
 const sockets = require('./sockets')
 
-console.log('loading saved data')
-users.init()
-chats.init()
-console.log('data loaded')
 
-const app = express()
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: false}))
+//start server after connection to Database
+db.init(() => {
+  //create express app and load parsing middleware
+  const app = express()
+  app.use(bodyParser.json())
+  app.use(bodyParser.urlencoded({extended: false}))
 
-app.use(express.static('public'))
-app.use('/user', users.router)
-app.use('/chat', users.authMiddleware)
-app.use('/chat', chats.router)
+  //serve static files and api
+  app.use(express.static('public'))
+  app.use('/user', users.router)
+  app.use('/chat', users.authMiddleware)
+  app.use('/chat', chats.router)
 
-const server = http.createServer(app)
-
-sockets.init(server)
-
-server.listen(process.env.PORT || config.port, () => {
-  console.log('Server is running on ' + (process.env.PORT || config.port))
+  //create http server for express and socket.io
+  const server = http.createServer(app)
+  sockets.init(server)
+  server.listen(process.env.PORT || config.port, () => {
+    console.log('Server is running on ' + (process.env.PORT || config.port))
+  })
 })
-
-process.on('exit', exit)
-process.on('SIGINT', exit)
-
-function exit () {
-  users.exit()
-  chats.exit()
-  process.exit()
-}
