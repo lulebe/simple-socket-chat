@@ -55,9 +55,13 @@ button:disabled:hover {
   height: 100vh;
   margin: 0 auto;
   display: flex;
+  -webkit-display: flex;
   flex-direction: row;
   justify-content: center;
   flex-wrap: wrap;
+  -webkit-flex-direction: row;
+  -webkit-justify-content: center;
+  -webkit-flex-wrap: wrap;
   background: white;
   overflow-y: auto;
 }
@@ -71,6 +75,7 @@ button:disabled:hover {
     min-width: 320px;
     padding: 24px;
     flex-grow: 1;
+    -webkit-flex-grow: 1;
     background: #f8f8f8;
 }
 

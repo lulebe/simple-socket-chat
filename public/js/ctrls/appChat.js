@@ -13,9 +13,15 @@ angular.module('chatapp')
       $state.go('app.newChat')
       return
     }
-    chat.messages = chat.messages.map(message => addUsernameToMsg(message, chat.members))
+    chat.messages = chat.messages.map(function(message) {
+      return addUsernameToMsg(message, chat.members)
+    })
     if (!chat.groupName && chat.members.length === 2)
-      chat.groupName = 'Chat with ' + chat.members.map(mem => mem.name).filter(name => name !== login.getUsername())[0]
+      chat.groupName = 'Chat with ' + chat.members.map(function(mem) {
+        return mem.name
+      }).filter(function(name) {
+        return name !== login.getUsername()
+      })[0]
     $scope.chat = chat
     $rootScope.$on('newMessage', function (e, data) {
       if (data.chatid == $stateParams.chatid) {
@@ -27,10 +33,13 @@ angular.module('chatapp')
   })
 
   function addUsernameToMsg(msg, members) {
-    matches = members.filter(member => member._id === msg.by)
+    matches = members.filter(function (member) {
+      return member._id === msg.by
+    })
     if (matches.length !== 1)
       return msg
-    return Object.assign({}, msg, {username: matches[0].name})
+    msg.username = matches[0].name
+    return msg
   }
 
 })

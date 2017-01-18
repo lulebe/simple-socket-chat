@@ -16,7 +16,9 @@ angular.module('chatapp')
     if ($scope.users.length === 0)
       return
     chat.createChat(
-      $scope.users.map(user => user._id),
+      $scope.users.map(function(user) {
+        return user._id
+      }),
       $scope.groupName.length > 0 ? $scope.groupName : null,
       function (chat) {
         if (chat)

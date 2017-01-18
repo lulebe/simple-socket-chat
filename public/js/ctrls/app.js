@@ -7,20 +7,26 @@ angular.module('chatapp')
 
   $scope.chats = []
   chats.getChatList(function (list) {
-    $scope.chats = list.map(chat => addMemberNamesToChat(chat))
+    $scope.chats = list.map(function (chat) {
+      return addMemberNamesToChat(chat)
+    })
     $rootScope.$on('createdChat', function (e, newChat) {
       $timeout(function () {
-        console.log(newChat)
         $scope.chats.push(addMemberNamesToChat(newChat))
       })
     })
   })
 
   function addMemberNamesToChat(chat) {
-    var names = chat.members.map(mem => mem.name)
+    var names = chat.members.map(function(mem) {
+      return mem.name
+    })
     if (names.length === 2)
-      names = names.filter(name => name !== login.getUsername())
-    return Object.assign({}, chat, {memberNames: names.join(', ')})
+      names = names.filter(function(name) {
+        return name !== login.getUsername()
+      })
+    chat.memberNames = names.join(', ')
+    return chat
   }
 
 })
