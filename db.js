@@ -53,10 +53,14 @@ chatSchema.statics.createChat = function (members, groupName, cb) {
   chat.save((err, createdChat) => {
     if (err)
       return cb(err)
-    createdChat.members.forEach(member => {
-      sockets.sendToUser(member, socketevents.createdChat, createdChat)
+    models.Chat.findById(createdChat.id).populate('members', 'name').exec((err, popChat) => {
+      if (err)
+        return cb(err)
+      popChat.members.forEach(member => {
+        sockets.sendToUser(member.id, socketevents.createdChat, popChat)
+      })
+      cb(null, popChat)
     })
-    cb(null, createdChat)
   })
 }
 
@@ -69,7 +73,7 @@ chatSchema.methods.isGroup = function () {
 }
 
 chatSchema.methods.addMessageByUser = function (userId, message, cb) {
-  if (this.members.indexOf(userId) >= 0) {
+  if (this.members.some(mem => mem.equals(userId))) {
     const newMessage = this.messages.create({
       content: message,
       by: userId,

@@ -14,7 +14,7 @@ angular.module('chatapp')
       socket.emit('authentication', token)
       socket.on('authenticated', function () {
         socket.on('createdChat', function (data) {
-          $rootScope.$emit('createdChat', data.chat)
+          $rootScope.$emit('createdChat', data)
         })
         socket.on('newMessage', function (data) {
           $rootScope.$emit('newMessage', data)

@@ -4,7 +4,11 @@
   <a ui-sref="app.newChat" class="button">create new chat</a><br><br>
   <hr>
   <ul>
-    <li ng-repeat="chat in chats"><a ui-sref="app.chat({chatid: chat._id})">{{chat.members}}</a></li>
+    <li ng-repeat="chat in chats">
+      <a ui-sref="app.chat({chatid: chat._id})">
+        {{chat.groupName}} {{chat.memberNames}}
+      </a>
+    </li>
   </ul>
 </div>
 <div ui-view class="chat" scroll-glue>

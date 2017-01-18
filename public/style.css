@@ -40,6 +40,13 @@ button:active, .button:active {
   outline: none;
   transform: scale(0.9);
 }
+button:disabled {
+  cursor: inherit;
+  background: grey;
+}
+button:disabled:hover {
+  background: grey;
+}
 
 
 

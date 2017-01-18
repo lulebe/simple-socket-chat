@@ -52,7 +52,7 @@ chatRouter.post('/', (req, res) => {
 chatRouter.post('/:chatid/message', (req, res) => {
   if (!req.body.message)
     return res.status(400).send({msg: "No message was specified"})
-  models.Chat.getIfForUser(req.params.chatid, req.user.id, (err, chat) => {
+  models.Chat.findById(req.params.chatid, (err, chat) => {
     if (err)
       return res.status(500).send(err)
     if (!chat)

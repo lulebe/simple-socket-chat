@@ -1,18 +1,10 @@
 angular.module('chatapp')
 .factory('chat', function ($http, $window, $rootScope) {
 
-  function createChat(partnername, cb) {
-    $http.get($window.location.origin + '/user/search?q=' + partnername)
+  function createChat(partnerids, groupName, cb) {
+    $http.post($window.location.origin + '/chat', {partners: partnerids, groupName: groupName})
     .then(function (res) {
-      if (!res.data)
-        return cb(null)
-      $http.post($window.location.origin + '/chat', {partners: [res.data._id]})
-      .then(function (res) {
-        cb(res.data)
-        $rootScope.$emit('createdChat', res.data)
-      }, function () {
-        cb(null)
-      })
+      cb(res.data)
     }, function () {
       cb(null)
     })

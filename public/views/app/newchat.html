@@ -1,5 +1,12 @@
 <h1>create a new Chat</h1>
-<form ng-submit="createChat()">
+<ul>
+  <li ng-repeat="user in users">{{user.name}}</li>
+</ul>
+<form ng-submit="addUser()">
   <input type="text" ng-model="partner" placeholder="Partner username"><br>
-  <button type="submit">create Chat</button>
+  <button type="submit">add User</button>
 </form>
+<form ng-submit="createChat()">
+  <input type="text" ng-model="groupName" placeholder="group Name (optional)">
+  <button type="submit" ng-disabled="users.length == 0">create Chat</button>
+<form>
