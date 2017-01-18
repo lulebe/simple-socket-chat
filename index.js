@@ -25,7 +25,7 @@ db.init(() => {
   //create http server for express and socket.io
   const server = http.createServer(app)
   sockets.init(server)
-  server.listen(process.env.PORT || config.port, () => {
-    console.log('Server is running on ' + (process.env.PORT || config.port))
+  server.listen(config.port, () => {
+    console.log('Server is running on ' + config.port)
   })
 })
