@@ -81,7 +81,7 @@ chatSchema.methods.addMessageByUser = function (userId, message, cb) {
         return cb(err)
       //socket updates
       this.members.forEach(member => {
-        sockets.sendToUser(member, socketevents.newMessage, newMessage)
+        sockets.sendToUser(member, socketevents.newMessage, {chatid: chat.id, message: newMessage})
       })
       cb(null, newMessage)
     })
@@ -100,7 +100,7 @@ chatSchema.methods.updateMessage = function (messageId, userId, message, cb) {
   storedMessage.date = Date.now()
   chat.save((err, updatedChat) => {
     updatedChat.members.forEach(member => {
-      sockets.sendToUser(member, socketevents.messageUpdate, storedMessage)
+      sockets.sendToUser(member, socketevents.messageUpdate, {chatid: chat.id, message: storedMessage})
     })
     cb(err, storedMessage)
   })
