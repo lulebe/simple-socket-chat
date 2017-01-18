@@ -1,6 +1,9 @@
 angular.module('chatapp')
 .controller('appChatCtrl', function ($scope, $rootScope, $stateParams, $state, $timeout, login, chat) {
 
+  $scope.messageInput = ''
+  $scope.chat = null
+
   $scope.sendMessage = function () {
     chat.sendMessage($stateParams.chatid, $scope.messageInput, function (msg) {
       if (msg == null) return

@@ -1,11 +1,12 @@
 angular.module('chatapp')
 .controller('appCtrl', function ($scope, $rootScope, $timeout, $state, login, chats) {
+  
+  $scope.chats = []
+
 
   $scope.signout = function () {
     login.signout()
   }
-
-  $scope.chats = []
   chats.getChatList(function (list) {
     $scope.chats = list.map(function (chat) {
       return addMemberNamesToChat(chat)
