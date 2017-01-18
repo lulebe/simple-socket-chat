@@ -18,7 +18,7 @@ app.config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
       controller: 'appCtrl'
     })
     .state('app.chat', {
-      url: '/chat/:username',
+      url: '/chat/:chatid',
       templateUrl: 'views/app/chat.html',
       controller: 'appChatCtrl'
     })

@@ -38,7 +38,9 @@ chatRouter.post('/', (req, res) => {
   if (!req.body.partners)
     return res.status(400).send({msg: "No chat partners specified"})
   const users = [req.user.id]
-  users.concat(req.body.partners)
+  req.body.partners.forEach(partner => {
+    users.push(partner)
+  })
   models.Chat.createChat(users, req.body.groupName, (err, chat) => {
     if (err)
       return res.status(500).send(err)
@@ -55,7 +57,7 @@ chatRouter.post('/:chatid/message', (req, res) => {
       return res.status(500).send(err)
     if (!chat)
       return res.status(404).send({msg: "Chat was not found"})
-    chat.addMessageByUser(req.user.id, req.body.message, (err, message) {
+    chat.addMessageByUser(req.user.id, req.body.message, (err, message) => {
       if (err && err.httpStatus)
         return res.status(err.httpStatus).send({msg: err.msg})
       if (err)
@@ -69,17 +71,17 @@ chatRouter.post('/:chatid/message', (req, res) => {
 chatRouter.put('/:chatid/message/:messageid', (req, res) => {
   if (!req.body.message)
     return res.status(400).send({msg: "No message was specified"})
-  models.Chat.updateMessage(
-    req.params.chatid,
-    req.params.messageid,
-    req.user.id,
-    req.body.message,
-    (err, message) => {
+  models.Chat.findById(req.params.chatid, (err, chat) => {
+    if (err)
+      return res.status(500).send(err)
+    if (!chat)
+      return res.status(404).send({msg: "Chat does not exist"})
+    chat.updateMessage(req.params.messageid, req.user.id, req.body.message, (err, message) => {
       if (err && err.httpStatus)
         return res.status(err.httpStatus).send({msg: err.msg})
       if (err)
         return res.status(500).send(err)
-      res.status(201).send(message)
-    }
-  )
+      res.status(200).send(message)
+    })
+  })
 })

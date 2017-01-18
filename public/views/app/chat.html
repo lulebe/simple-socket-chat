@@ -1,7 +1,7 @@
 <h1>Chat with {{partner}}</h1>
 
 <ul>
-  <li ng-repeat="message in chat.messages"><strong>{{message.by}}:</strong> {{message.msg}}</li>
+  <li ng-repeat="message in chat.messages"><strong>{{message.by}}:</strong> {{message.content}}</li>
 </ul>
 
 <form ng-submit="sendMessage()">

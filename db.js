@@ -18,7 +18,7 @@ const userSchema = Schema({
 })
 
 userSchema.methods.getChats = function (cb) {
-  return this.model('Chat').find({members: this.id}).select('-messages').exec(cb);
+  return models.Chat.find({members: this.id}).select('-messages').populate('members', 'name').exec(cb);
 }
 
 
@@ -29,7 +29,7 @@ const chatSchema = Schema({
     ref: 'User',
     validate: {
       validator: function(v, cb) {
-        this.model('User').findById(v, (err, user) => {
+        models.User.findById(v, (err, user) => {
           cb(!err && user != null)
         })
       },
@@ -45,32 +45,23 @@ const chatSchema = Schema({
 })
 
 chatSchema.statics.createChat = function (members, groupName, cb) {
-  const chat = new this.model('Chat')({
+  const chat = new models.Chat({
     members: members,
     groupName: groupName,
     messages: []
   })
-  chat.save((err, chat) => {
+  chat.save((err, createdChat) => {
     if (err)
       return cb(err)
-    chat.members.forEach(member => {
-      sockets.sendToUser(member, socketevents.createdChat, chat)
+    createdChat.members.forEach(member => {
+      sockets.sendToUser(member, socketevents.createdChat, createdChat)
     })
-    cb(null, chat)
+    cb(null, createdChat)
   })
 }
 
 chatSchema.statics.getIfForUser = function (chatId, userId, cb) {
-  return this.findById(chatId).where({members: userId}).exec(cb)
-}
-
-//TODO fully implement
-chatSchema.statics.updateMessage = function (chatId, messageId, userId, message, cb) {
-  //1. find message
-  //2. check permission (message.by === userId)
-  //3. edit & save message
-  //4. send socket updates
-  //5. call cb
+  return this.findById(chatId).where({members: userId}).populate('members', 'name').exec(cb)
 }
 
 chatSchema.methods.isGroup = function () {
@@ -79,24 +70,40 @@ chatSchema.methods.isGroup = function () {
 
 chatSchema.methods.addMessageByUser = function (userId, message, cb) {
   if (this.members.indexOf(userId) >= 0) {
-    this.messages.push({
+    const newMessage = this.messages.create({
       content: message,
       by: userId,
       edited: false
     })
+    this.messages.push(newMessage)
     this.save((err, chat) => {
       if (err)
         return cb(err)
-      const message = chat.messages[chat.messages.length - 1]
       //socket updates
       this.members.forEach(member => {
-        sockets.sendToUser(member, socketevents.newMessage, message)
+        sockets.sendToUser(member, socketevents.newMessage, newMessage)
       })
-      cb(null, message)
+      cb(null, newMessage)
     })
   } else {
     cb({httpStatus: 403, msg: "user is not a chat member"})
   }
+}
+
+chatSchema.methods.updateMessage = function (messageId, userId, message, cb) {
+  const chat = this
+  const storedMessage = chat.messages.id(messageId)
+  if (!storedMessage.by.equals(userId))
+    return cb({httpStatus: 403, msg: "User is not authorized to edit this message"})
+  storedMessage.edited = true
+  storedMessage.content = message
+  storedMessage.date = Date.now()
+  chat.save((err, updatedChat) => {
+    updatedChat.members.forEach(member => {
+      sockets.sendToUser(member, socketevents.messageUpdate, storedMessage)
+    })
+    cb(err, storedMessage)
+  })
 }
 
 
@@ -108,7 +115,8 @@ const init = cb => {
   db.on('error', console.error.bind(console, 'connection error: '))
   db.once('open', function() {
     models.User = mongoose.model('User', userSchema)
-    models.Chat = mongoose.model('Chat', userSchema)
+    models.Chat = mongoose.model('Chat', chatSchema)
+    cb()
   });
 }
 

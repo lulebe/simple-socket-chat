@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt')
 const config = require('./config')
 const models = require('./db').models
 
-module.exports = {router: userRouter, findByName: findByName, authMiddleware}
+module.exports = {router: userRouter, authMiddleware}
 
 
 //HELPERS
@@ -52,7 +52,7 @@ userRouter.post('/', (req, res) => {
     if (err)
       return res.status(500).send(err)
     if (registeredUser != null)
-      return res.status(403).send({msg: 'Username is already taken'}))
+      return res.status(403).send({msg: 'Username is already taken'})
     //add user
     bcrypt.hash(req.body.password, config.bcryptSaltRounds, (err, hash) => {
       if (err)
@@ -96,7 +96,7 @@ userRouter.post('/login', (req, res) => {
 userRouter.get('/search', (req, res) => {
   if (!req.query.q)
     return res.status(400).send({msg: "No search query param (q) provided"})
-  models.User.findOne({username: req.query.q}).select('name').exec((err, user) {
+  models.User.findOne({name: req.query.q}).select('name').exec((err, user) => {
     if (err)
       return res.status(500).send(err)
     res.status(200).send(user)
@@ -110,6 +110,7 @@ userRouter.get('/:userid', (req, res) => {
     if (err)
       return res.status(500).send(err)
     if (!user)
-      return res.status(404).send({msg: 'User was not found'}))
+      return res.status(404).send({msg: 'User was not found'})
     res.status(200).send(user)
+  })
 })
