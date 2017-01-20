@@ -11,7 +11,7 @@ angular.module('chatapp')
     }).then(function (res) {
       currentToken = res.data
       currentUsername = username
-      socket.openSocket(currentToken)
+      //socket.openSocket(currentToken)
       $injector.get('$state').go('app.newChat')
     }, function (res) {
       //TODO handle signin error
@@ -21,7 +21,7 @@ angular.module('chatapp')
   function signout () {
     currentToken = null
     currentUsername = null
-    socket.closeSocket()
+    //socket.closeSocket()
     $injector.get('$state').go('index')
   }
 
@@ -32,7 +32,7 @@ angular.module('chatapp')
     }).then(function (res) {
       currentToken = res.data
       currentUsername = username
-      socket.openSocket(currentToken)
+      //socket.openSocket(currentToken)
       $injector.get('$state').go('app.newChat')
     }, function (res) {
       //TODO handle signup error
