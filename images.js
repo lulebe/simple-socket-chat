@@ -7,7 +7,7 @@ function cloud () {
   const save = (buffer, cb) => {
     const cloudStream = cloudinary.uploader.upload_stream(result => {
       console.log(result)
-      cb(null, result.url)
+      cb(null, result.secure_url)
     }, { width: 1000, height: 1000, crop: "limit" })
     streamifier.createReadStream(buffer).pipe(cloudStream)
   }
