@@ -48,6 +48,15 @@ button:disabled:hover {
   background: grey;
 }
 
+img[ng-click] {
+  cursor: pointer;
+  opacity: 0.8;
+}
+img[ng-click]:hover {
+  opacity: 1.0
+}
+
+
 
 
 
