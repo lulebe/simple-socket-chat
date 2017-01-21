@@ -1,4 +1,4 @@
-module.exports = process.env.NODE_ENV == 'PRODUCTION' ? cloud() : local()
+module.exports = process.env.NODE_ENV == 'production' ? cloud() : local()
 
 
 function cloud () {
