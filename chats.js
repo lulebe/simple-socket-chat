@@ -1,4 +1,3 @@
-const UUID = require('node-time-uuid')
 const multer = require('multer')
 const imageType = require('image-type')
 const upload = multer({storage: multer.memoryStorage()})
