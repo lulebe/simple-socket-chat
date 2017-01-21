@@ -2,7 +2,7 @@ angular.module('chatapp')
 .controller('appNewChatCtrl', function ($scope, $state, login, user, chat) {
 
   $scope.users = []
-  $scope.groupName = "new Group"
+  $scope.groupName = ''
 
   $scope.addUser = function () {
     user.searchUser($scope.partner, function (user) {
