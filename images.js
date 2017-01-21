@@ -9,7 +9,7 @@ function cloud () {
       console.log(result)
       cb(null, result.url)
     }, { width: 1000, height: 1000, crop: "limit" })
-    streamifier.createReamStream(buffer).pipe(cloudStream)
+    streamifier.createReadStream(buffer).pipe(cloudStream)
   }
   return {
     save: save
