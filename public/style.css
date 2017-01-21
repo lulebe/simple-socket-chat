@@ -91,3 +91,8 @@ button:disabled:hover {
       box-shadow: 10px 0 15px -15px black inset;
   }
 }
+
+.message-list img {
+  max-width: 100%;
+  max-height: 300px;
+}

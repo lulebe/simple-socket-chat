@@ -21,14 +21,13 @@ function cloud () {
 function local () {
   const fs = require('fs')
   const path = require('path')
-  const imageType = require('image-typ')
+  const imageType = require('image-type')
   const save = (buffer, cb) => {
     const randomName = 'img_'
       + Date.now()
       + (Math.floor(Math.random()*10000))
       + '.'
-      + imageType(fileData.buffer).ext
-    console.log(randomName)
+      + imageType(buffer).ext
     fs.writeFile(path.join(__dirname, 'uploads/', randomName), buffer, err => {
       if (err)
         cb(err)

@@ -29,10 +29,9 @@ angular.module('chatapp')
   }
 
   function sendImage (chatid, image, cb) {
-    console.log(image)
     var fd = new FormData()
     fd.append('image', image)
-    $http.post($window.location.origin + '/chat/' + chatid + '/message', fd, {
+    $http.post($window.location.origin + '/chat/' + chatid + '/image', fd, {
       headers: {'Content-Type': undefined },
       transformRequest: angular.identity
     })

@@ -10,7 +10,7 @@
       <strong>{{message.username}}:</strong> {{message.content}}
     </span>
     <span ng-if="message.image">
-      <strong>{{message.username}}:</strong> <img ng-src="message.content">
+      <strong>{{message.username}}:</strong> <img ng-src="{{message.content}}">
     </span>
   </li>
 </ul>

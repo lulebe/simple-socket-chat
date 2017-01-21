@@ -40,6 +40,7 @@ const chatSchema = Schema({
     content: {type: String, required: true},
     by: {type: Schema.Types.ObjectId, required: true, ref: 'User'},
     date: {type: Date, default: Date.now},
+    image: Boolean,
     edited: Boolean
   }]
 })

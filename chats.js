@@ -80,7 +80,7 @@ chatRouter.post('/:chatid/image', upload.single('image'), (req, res) => {
       return res.status(500).send(err)
     if (!chat)
       return res.status(404).send({msg: "Chat was not found"})
-    images.save(req.file, (err, url) {
+    images.save(req.file.buffer, (err, url) => {
       if (err)
         return res.status(500).send(err)
       chat.addImageByUser(req.user.id, url, (err, image) => {
