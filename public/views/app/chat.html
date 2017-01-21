@@ -4,11 +4,24 @@
   <li ng-repeat="member in chat.members">{{member.name}}</li>
 </ul>
 <h2>Messages</h2>
-<ul>
-  <li ng-repeat="message in chat.messages"><strong>{{message.username}}:</strong> {{message.content}}</li>
+<ul class="message-list">
+  <li ng-repeat="message in chat.messages">
+    <span ng-if="!message.image">
+      <strong>{{message.username}}:</strong> {{message.content}}
+    </span>
+    <span ng-if="message.image">
+      <strong>{{message.username}}:</strong> <img ng-src="message.content">
+    </span>
+  </li>
 </ul>
 
 <form ng-submit="sendMessage()">
   <input type="text" ng-model="messageInput" placeholder="new message"><br>
   <button type="submit">send</button>
+</form>
+
+<button ng-hide="fileShown" ng-click="fileShown = true">send Image</button>
+<form ng-submit="sendImage()" ng-hide="!fileShown">
+  <input type="file" accept="image/*" file="fileInput">
+  <button type="submit">upload</button>
 </form>

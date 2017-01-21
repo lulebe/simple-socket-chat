@@ -19,8 +19,23 @@ angular.module('chatapp')
     })
   }
 
-  function sendMessage (partnername, message, cb) {
-    $http.post($window.location.origin + '/chat/' + partnername + '/message', {message: message})
+  function sendMessage (chatid, message, cb) {
+    $http.post($window.location.origin + '/chat/' + chatid + '/message', {message: message})
+    .then(function (res) {
+      cb(res.data)
+    }, function () {
+      cb(null)
+    })
+  }
+
+  function sendImage (chatid, image, cb) {
+    console.log(image)
+    var fd = new FormData()
+    fd.append('image', image)
+    $http.post($window.location.origin + '/chat/' + chatid + '/message', fd, {
+      headers: {'Content-Type': undefined },
+      transformRequest: angular.identity
+    })
     .then(function (res) {
       cb(res.data)
     }, function () {
@@ -31,6 +46,7 @@ angular.module('chatapp')
   return {
     createChat, createChat,
     getChat: getChat,
-    sendMessage: sendMessage
+    sendMessage: sendMessage,
+    sendImage: sendImage
   }
 })

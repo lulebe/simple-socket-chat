@@ -1,10 +1,14 @@
 const UUID = require('node-time-uuid')
+const multer = require('multer')
+const imageType = require('image-type')
+const upload = multer({storage: multer.memoryStorage()})
 const chatRouter = require('express').Router()
 
 const config = require('./config')
 const eventnames = require('./socketevents.json')
 const users = require('./users')
 const sockets = require('./sockets')
+const images = require('./images')
 const models = require('./db').models
 
 module.exports = {router: chatRouter}
@@ -63,6 +67,29 @@ chatRouter.post('/:chatid/message', (req, res) => {
       if (err)
         return res.status(500).send(err)
       res.status(201).send(message)
+    })
+  })
+})
+
+//post new message into chat if allowed to
+chatRouter.post('/:chatid/image', upload.single('image'), (req, res) => {
+  if (!req.file || !imageType(req.file.buffer))
+    return res.status(400).send({msg: "No file was uploaded"})
+  models.Chat.findById(req.params.chatid, (err, chat) => {
+    if (err)
+      return res.status(500).send(err)
+    if (!chat)
+      return res.status(404).send({msg: "Chat was not found"})
+    images.save(req.file, (err, url) {
+      if (err)
+        return res.status(500).send(err)
+      chat.addImageByUser(req.user.id, url, (err, image) => {
+        if (err && err.httpStatus)
+          return res.status(err.httpStatus).send({msg: err.msg})
+        if (err)
+          return res.status(500).send(err)
+        res.status(201).send(image)
+      })
     })
   })
 })

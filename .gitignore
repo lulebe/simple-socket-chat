@@ -1,3 +1,4 @@
 node_modules
+uploads/**
 chatdata.json
 userdata.json

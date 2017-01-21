@@ -94,6 +94,29 @@ chatSchema.methods.addMessageByUser = function (userId, message, cb) {
   }
 }
 
+chatSchema.methods.addImageByUser = function (userId, imageUrl, cb) {
+  if (this.members.some(mem => mem.equals(userId))) {
+    const newMessage = this.messages.create({
+      content: imageUrl,
+      by: userId,
+      image: true,
+      edited: false
+    })
+    this.messages.push(newMessage)
+    this.save((err, chat) => {
+      if (err)
+        return cb(err)
+      //socket updates
+      this.members.forEach(member => {
+        sockets.sendToUser(member, socketevents.newMessage, {chatid: chat.id, message: newMessage})
+      })
+      cb(null, newMessage)
+    })
+  } else {
+    cb({httpStatus: 403, msg: "user is not a chat member"})
+  }
+}
+
 chatSchema.methods.updateMessage = function (messageId, userId, message, cb) {
   const chat = this
   const storedMessage = chat.messages.id(messageId)

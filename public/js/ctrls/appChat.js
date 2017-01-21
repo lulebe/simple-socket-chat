@@ -1,13 +1,22 @@
 angular.module('chatapp')
 .controller('appChatCtrl', function ($scope, $rootScope, $stateParams, $state, $timeout, login, chat) {
 
+  $scope.fileShown = false
   $scope.messageInput = ''
+  $scope.fileInput = null
   $scope.chat = {groupName: 'loading', members: [], messages: []}
 
   $scope.sendMessage = function () {
     chat.sendMessage($stateParams.chatid, $scope.messageInput, function (msg) {
       if (msg == null) return
       $scope.messageInput = ""
+    })
+  }
+
+  $scope.sendImage = function () {
+    chat.sendImage($stateParams.chatid, $scope.fileInput, function (msg) {
+      $scope.fileInput = null
+      $scope.fileShown = false
     })
   }
 

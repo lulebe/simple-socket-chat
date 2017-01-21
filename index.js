@@ -18,6 +18,7 @@ db.init(() => {
 
   //serve static files and api
   app.use(express.static('public'))
+  app.use('/uploads', express.static('uploads'))
   app.use('/user', users.router)
   app.use('/chat', users.authMiddleware)
   app.use('/chat', chats.router)
